@@ -12,3 +12,17 @@ def insert_user(request):
             serializer.save()  # Insert data into User table
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def fetch_user(request):
+    user_id = request.query_params.get('userid')
+    
+    if user_id:
+        try:
+            user = User.objects.get(userID = user_id)
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response({'error': 'User ID not provided'}, status=status.HTTP_400_BAD_REQUEST)

@@ -24,3 +24,14 @@ class User(models.Model):
 
     def __str__(self):
         return self.name
+
+class Courses(models.Model):
+    courseID = models.AutoField(primary_key=True)
+    courseName = models.CharField(max_length=100)
+    courseStatus = models.CharField(max_length=50)
+    
+    class Meta:
+        db_table = 'Courses'  # Connect to Courses table
+        
+    def __str__(self):
+        return self.courseName

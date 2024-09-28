@@ -21,5 +21,6 @@ from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('v1/user/create/', views.insert_user, name='insert_user'),
+    path('v1/user/create/', views.insert_user, name='insert_user'), # For inserting users
+    path('v1/user/fetch/', views.fetch_user, name='fetch_user'), # For fetching user details
 ]
