@@ -1,3 +1,26 @@
 from django.db import models
 
-# Create your models here.
+class User(models.Model):
+    STUDENT = 'Student'
+    NON_STUDENT = 'Non-Student'
+    ADMIN = 'Admin'
+    
+    ROLE_CHOICES = [
+        (STUDENT, 'Student'),
+        (NON_STUDENT, 'Non-Student'),
+        (ADMIN, 'Admin'),
+    ]
+    
+    userID = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    nickname = models.CharField(max_length=50, null=True, blank=True)
+    major = models.CharField(max_length=100, null=True, blank=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=12)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default=NON_STUDENT)
+    
+    class Meta:
+        db_table = 'User'  # Connect to User table
+
+    def __str__(self):
+        return self.name
