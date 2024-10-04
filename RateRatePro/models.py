@@ -1,6 +1,6 @@
 from django.db import models
 
-class User(models.Model):
+class Users(models.Model):
     STUDENT = 'Student'
     NON_STUDENT = 'Non-Student'
     PROFESSOR = 'Professor'
@@ -13,16 +13,16 @@ class User(models.Model):
         (PROFESSOR, 'Professor'),
     ]
     
-    userID = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    nickname = models.CharField(max_length=50, null=True, blank=True)
-    major = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=12)
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default=NON_STUDENT)
+    userid = models.AutoField(primary_key=True, db_column='Id')
+    username = models.CharField(max_length=100, db_column='UserName')
+    nickname = models.CharField(max_length=50, null=True, blank=True, db_column='NickName')
+    major = models.CharField(max_length=100, null=True, blank=True, db_column='Major')
+    email = models.EmailField(unique=True, db_column='Email')
+    password = models.CharField(max_length=12, db_column='Password')
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default=NON_STUDENT, db_column='Role')
     
     class Meta:
-        db_table = 'User'  # Connect to User table
+        db_table = 'Users'  # Connect to User table
 
     def __str__(self):
         return self.name

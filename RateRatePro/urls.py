@@ -23,7 +23,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     
     #* API endpoints for managing users
-    path('v1/user/create/', views.insert_user, name='insert_user'), # For inserting users
+    path('v1/user/create/', views.create_user, name='insert_user'), # For inserting users
     path('v1/user/fetch/', views.fetch_user, name='fetch_user'), # For fetching user details
     path('v1/user/authenticate/', views.authenticate_user, name='authenticate_user'), # For authenticating users using username and password
 ]
