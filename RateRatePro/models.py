@@ -3,12 +3,14 @@ from django.db import models
 class User(models.Model):
     STUDENT = 'Student'
     NON_STUDENT = 'Non-Student'
+    PROFESSOR = 'Professor'
     ADMIN = 'Admin'
     
     ROLE_CHOICES = [
         (STUDENT, 'Student'),
         (NON_STUDENT, 'Non-Student'),
         (ADMIN, 'Admin'),
+        (PROFESSOR, 'Professor'),
     ]
     
     userID = models.AutoField(primary_key=True)
