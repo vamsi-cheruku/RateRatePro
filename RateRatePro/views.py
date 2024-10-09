@@ -54,7 +54,7 @@ def create_user(request):
                     
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                print("Error while indexing user document")
+                print("Error while indexing user document in Elastic Search")
                 # return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         error_message = list(serializer.errors.values())[0][0]
@@ -105,7 +105,7 @@ def authenticate_user(request):
 @api_view(['GET'])
 def search_users(request):
     search_query = request.query_params.get('query', '')
-    
+    filters = request.query_params.get('filters')
     if search_query:
         # Call Elasticsearch to perform the search
         search_results = es.search(

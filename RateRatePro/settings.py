@@ -92,6 +92,11 @@ ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'localhost:9200'  # Replace with your Elasticsearch host if different
     },
+    
+    #! AWS Elasticsearch credentials 
+    # 'default' : {
+    #     'hosts' : 'https://search-rateratepro-v6v5ugewbfvijd7akccrma7pry.aos.us-east-1.on.aws'
+    # }
 }
 
 # Password validation
