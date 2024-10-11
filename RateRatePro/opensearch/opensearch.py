@@ -1,14 +1,16 @@
-from elasticsearch import Elasticsearch
+from opensearchpy import OpenSearch
 
-from .constants import esconsts
-
-#* Create an Elasticsearch client
-es = Elasticsearch([esconsts.ES_ENDPOINT])
+client = OpenSearch(
+    hosts=[{'host': 'https://search-rateratepro-v6v5ugewbfvijd7akccrma7pry.aos.us-east-1.on.aws', 'port': 443}],
+    http_auth=('admin', 'OpenSearch@007'),
+    # use_ssl=True,
+    # verify_certs=True
+)
 
 #* Function to create an index if it does not exist.
 def create_user_index(index_name):
-    if not es.indices.exists(index = index_name):
-        es.indices.create(
+    if not client.indices.exists(index = index_name):
+        client.indices.create(
             index=index_name,
             body={
                 "settings": {
@@ -30,4 +32,4 @@ def create_user_index(index_name):
 
 #* Function to index user details in Elasticsearch.
 def index_user(index_name, user_id, user_document):
-    es.index(index=index_name, id=user_id, body=user_document)
+    client.index(index=index_name, id=user_id, body=user_document)

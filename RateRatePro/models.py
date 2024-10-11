@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Courses(models.Model):
     STATUS_CHOICE = [
         ('Active', 'Active'),

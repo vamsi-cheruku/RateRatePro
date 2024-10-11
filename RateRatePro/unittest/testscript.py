@@ -1,6 +1,8 @@
 import unittest
-import requests
 from enum import Enum
+
+import requests
+
 
 class Url(Enum):
     TEST_SETUP_BASE_URL = "http://127.0.0.1:8000/v1/"

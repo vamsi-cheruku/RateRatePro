@@ -1,14 +1,18 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
+import json
+# from .elasticsearch import *
+import logging
 
 from django.shortcuts import get_object_or_404
-from .models import *
-from .serializers import *
-import json
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
 from .constants import esconsts
-from .elasticsearch import *
+from .models import *
+from .opensearch import *
+from .serializers import *
+
 
 @api_view(['POST'])
 def create_user(request):
@@ -49,16 +53,19 @@ def create_user(request):
                 }
                 
                 index_name = esconsts.USER_INDEX
-                create_index(index_name)
+                # create_user_index(index_name)
+                create_user_index(index_name)
                 index_user(index_name, user.id, user_document)  # Insert data into Elasticsearch index
                     
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                print("Error while indexing user document in Elastic Search")
-                # return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-        error_message = list(serializer.errors.values())[0][0]
-        print("Error while creating user document: ")
+        if serializer.errors:
+            error_message = list(serializer.errors.values())[0][0]
+        else:
+            error_message = "Unknown error occurred"
+
         return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

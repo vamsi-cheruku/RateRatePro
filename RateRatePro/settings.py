@@ -99,6 +99,8 @@ ELASTICSEARCH_DSL = {
     # }
 }
 
+OPENSEARCH_HOST = 'https://your-opensearch-domain'
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
