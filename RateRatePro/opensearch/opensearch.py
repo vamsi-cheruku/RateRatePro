@@ -1,15 +1,18 @@
+import logging
+
 from opensearchpy import OpenSearch
 
 client = OpenSearch(
-    hosts=[{'host': 'https://search-rateratepro-v6v5ugewbfvijd7akccrma7pry.aos.us-east-1.on.aws', 'port': 443}],
+    hosts=[{'host': 'search-rateratepro-v6v5ugewbfvijd7akccrma7pry.aos.us-east-1.on.aws', 'port': 443}],
     http_auth=('admin', 'OpenSearch@007'),
-    # use_ssl=True,
-    # verify_certs=True
+    use_ssl=True,
+    verify_certs=True
 )
 
 #* Function to create an index if it does not exist.
 def create_user_index(index_name):
     if not client.indices.exists(index = index_name):
+        logging.debug("Users index not exits")
         client.indices.create(
             index=index_name,
             body={
@@ -22,7 +25,7 @@ def create_user_index(index_name):
                         "userid": {"type": "integer"},
                         "username": {"type": "text"},
                         "nickname": {"type": "text"},
-                        "major": {"type": "text"},
+                        # "major": {"type": "text"},
                         "email": {"type": "keyword"},
                         "role": {"type": "keyword"},
                     }

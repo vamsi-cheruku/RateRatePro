@@ -37,3 +37,22 @@ class RatingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ratings
         fields = '__all__'
+
+class ProfessorRatingsSerializer(serializers.Serializer):
+    overall_rating = serializers.FloatField()
+    would_take_again = serializers.DictField(child=serializers.IntegerField())
+    academic_ability = serializers.FloatField()
+    teaching_ability = serializers.FloatField()
+    interactions_with_students = serializers.FloatField()
+    hardness = serializers.FloatField()
+    feedback = serializers.ListField(child=serializers.CharField())
+    courses = serializers.ListField(child=serializers.CharField())
+
+    def create(self, validated_data):
+        # Logic for creating a new entry if needed (optional for this use case)
+        return validated_data
+
+    def update(self, instance, validated_data):
+        # Logic for updating an entry if needed (optional for this use case)
+        return instance
+

@@ -1,4 +1,7 @@
+import logging
 from pathlib import Path
+
+logging.basicConfig(level=logging.DEBUG)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +16,7 @@ SECRET_KEY = "django-insecure-j7-x)@b=5yrbz(+c&*+&f(2d1k$)=*a530uhh#!@%4m)w-5jfe
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['34.205.32.248', 'localhost', '127.0.0.1']
 
 # To neglect the slash at the end of endpoint
 # APPEND_SLASH = False

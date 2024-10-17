@@ -103,12 +103,12 @@ class Professors(models.Model):
         
 
 class ProfessorCourses(models.Model):
-    course = models.ForeignKey(Courses, on_delete=models.CASCADE)
-    professor = models.ForeignKey(Professors, on_delete=models.CASCADE)
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE)
+    professor_id = models.ForeignKey(Professors, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'ProfessorCourses'
-        unique_together = ('course', 'professor')  # To ensure the uniqueness of the combination
+        unique_together = ('course_id', 'professor_id')  # To ensure the uniqueness of the combination
 
     def __str__(self):
-        return f'{self.professor.name} teaches {self.course.name}'
+        return f'{self.professor_id.name} teaches {self.course_id.name}'

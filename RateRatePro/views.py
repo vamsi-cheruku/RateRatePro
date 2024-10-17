@@ -2,6 +2,8 @@ import json
 # from .elasticsearch import *
 import logging
 
+from django.db.models import Avg, Case, Count, When
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -10,7 +12,7 @@ from rest_framework.response import Response
 
 from .constants import esconsts
 from .models import *
-from .opensearch import *
+from .opensearch.opensearch import *
 from .serializers import *
 
 
@@ -23,11 +25,11 @@ def create_user(request):
             
             match user.role:
                 case 'Student':
-                   pass
+                    pass
                 case 'Professor':
                     # Insert the Professor's data into the Professors table
-                    department_id = request.data.get('department_id')
-                    
+                    # department_id = request.data.get('department_id')
+                    department_id = 1
                     # Ensure department_id is provided
                     if not department_id:
                         return Response({'error': 'Department ID is required for Professors.'},status=status.HTTP_400_BAD_REQUEST)
@@ -56,10 +58,10 @@ def create_user(request):
                 # create_user_index(index_name)
                 create_user_index(index_name)
                 index_user(index_name, user.id, user_document)  # Insert data into Elasticsearch index
-                    
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                logging.error("Error while creating user in Elasticsearch: {}".format(e))
+                return Response({'error': 'Something went wrong while creating user'}, status=status.HTTP_400_BAD_REQUEST)
         
         if serializer.errors:
             error_message = list(serializer.errors.values())[0][0]
@@ -115,7 +117,7 @@ def search_users(request):
     filters = request.query_params.get('filters')
     if search_query:
         # Call Elasticsearch to perform the search
-        search_results = es.search(
+        search_results = client.search(
             index=esconsts.USER_INDEX,
             body = {
                 "query": {
@@ -247,3 +249,65 @@ def get_professor_ratings(request):
     
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def fetch_overall_rating(request):
+    professor_id = request.GET.get('professor_id')  # Get ProfID from query parameters
+    course_id = request.GET.get('course_id')  # Optionally get CourseID if needed
+
+    if professor_id:
+        try:
+            # Fetch ratings for the given ProfID and optionally CourseID
+            ratings = Ratings.objects.filter(professor_id=professor_id)
+            
+            if course_id:
+                ratings = ratings.filter(course_id=course_id)
+
+            if ratings.exists():
+                # Calculate averages for the relevant fields
+                aggregated_data = ratings.aggregate(
+                    overall_rating_avg=Avg('overall_rating'),
+                    would_take_again_count_1=Count(Case(When(would_take_again='1', then=1))),
+                    would_take_again_count_0=Count(Case(When(would_take_again='0', then=1))),
+                    academic_ability_avg=Avg('academic_ability'),
+                    teaching_ability_avg=Avg('teaching_ability'),
+                    interactions_with_students_avg=Avg('interactions_with_students'),
+                    hardness_avg=Avg('hardness')
+                )
+
+                # Fetch a maximum of 3 feedback entries
+                feedback_list = list(ratings.values_list('feedback', flat=True)[:3])
+                
+                # Combine would_take_again counts into a list
+                would_take_again_counts = {'1':aggregated_data['would_take_again_count_1'], '0':aggregated_data['would_take_again_count_0']}
+                
+                # Fetch the list of courses that the professsor is teaching
+                # courses = ProfessorCourses.objects.filter(professor_id=professor_id)
+                # print(courses)
+                # course_list = Courses.objects.filter(id__in=courses.values('id')).values_list('name', flat=True)
+                
+                # Return the averages in the required format using DRF's Response
+                # Pass the data to the serializer
+                serializer = ProfessorRatingsSerializer(data={
+                    'overall_rating': aggregated_data['overall_rating_avg'],
+                    'would_take_again': would_take_again_counts,
+                    'academic_ability': aggregated_data['academic_ability_avg'],
+                    'teaching_ability': aggregated_data['teaching_ability_avg'],
+                    'interactions_with_students': aggregated_data['interactions_with_students_avg'],
+                    'hardness': aggregated_data['hardness_avg'],
+                    'feedback': feedback_list,
+                    'courses': list()
+                })
+                
+                if serializer.is_valid():
+                    return Response(serializer.data, status=200)
+                else:
+                    return Response(serializer.errors, status=400)
+
+            else:
+                return Response({'error': 'No ratings found for this professor'}, status=404)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+    return Response({'error': 'professor_id parameter is required'}, status=400)
