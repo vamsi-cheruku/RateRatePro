@@ -23,9 +23,9 @@ urlpatterns = [
     #! API endpoints for managing courses
     path('v1/course/create', views.create_course, name='create_course'), # For creating a new course
     path('v1/course/addstudent/', views.add_student_in_course, name='add_student_in_course'), # For adding a new student in a course
+    path('v1/assign-course/', views.assign_course_to_professor, name='assign-course'),
     
     #! API endpoints for managing professors
-    path('v1/assign-course/', views.assign_course_to_professor, name='assign-course'),
     
     #! API endpoints for managing departments
     path('v1/department/create', views.create_department, name='create_department') # For creating a new department

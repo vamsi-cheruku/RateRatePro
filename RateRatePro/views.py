@@ -132,11 +132,11 @@ def search_users(request):
                             }
                         },
                         #! Filter to fetch only professors
-                        # "filter": {
-                        #     "term": {
-                        #         "role": "Professor"  # Filter by role
-                        #     }
-                        # }
+                        "filter": {
+                            "term": {
+                                "role": "Professor"  # Filter by role
+                            }
+                        }
                     }
                 }
             }
@@ -322,19 +322,19 @@ def assign_course_to_professor(request):
 
         # Retrieve the Professor and Course instances
         try:
-            professor = Professors.objects.get(id=professor_id)
-            course = Courses.objects.get(id=course_id)
+            professor_id = Professors.objects.get(id=professor_id)
+            course_id = Courses.objects.get(id=course_id)
         except Professors.DoesNotExist:
             return Response({'error': 'Professor not found'}, status=status.HTTP_404_NOT_FOUND)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # Check if the assignment already exists
-        if ProfessorCourses.objects.filter(professor_id=professor, course_id=course).exists():
+        if ProfessorCourses.objects.filter(professor_id=professor_id, course_id=course_id).exists():
             return Response({'error': 'This course is already assigned to the professor'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create the assignment
-        ProfessorCourses.objects.create(professor_id=professor, course_id=course)
+        ProfessorCourses.objects.create(professor_id=professor_id, course_id=course_id)
         
         return Response({'message': 'Course assigned to professor successfully'}, status=status.HTTP_201_CREATED)
     
