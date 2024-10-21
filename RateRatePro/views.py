@@ -29,7 +29,7 @@ def create_user(request):
                 case 'Professor':
                     # Insert the Professor's data into the Professors table
                     # department_id = request.data.get('department_id')
-                    department_id = 1
+                    department_id = 1 # default department id
                     # Ensure department_id is provided
                     if not department_id:
                         return Response({'error': 'Department ID is required for Professors.'},status=status.HTTP_400_BAD_REQUEST)
@@ -234,13 +234,13 @@ def get_professor_ratings(request):
         body = json.loads(request.body)
         professor_id = body.get('professor_id')
         course_id = body.get('course_id')
+        
         # Filter the Professor ratings by professor_id and course_id
         ratings = Ratings.objects.filter(professor_id=professor_id, course_id=course_id)
         
         # If no ratings found, return an error message
         if not ratings.exists():
-            return Response({'error': 'No ratings found for the given professor and course.'}, 
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'No ratings found for the given professor and course.'}, status=status.HTTP_404_NOT_FOUND)
         
         # Serialize the ratings data
         serializer = RatingsSerializer(ratings, many=True)
@@ -281,10 +281,10 @@ def fetch_overall_rating(request):
                 # Combine would_take_again counts into a list
                 would_take_again_counts = {'1':aggregated_data['would_take_again_count_1'], '0':aggregated_data['would_take_again_count_0']}
                 
-                # Fetch the list of courses that the professsor is teaching
-                # courses = ProfessorCourses.objects.filter(professor_id=professor_id)
-                # print(courses)
-                # course_list = Courses.objects.filter(id__in=courses.values('id')).values_list('name', flat=True)
+                # Fetch the list of courses that the professor is teaching
+                courses = Courses.objects.filter(
+                    id__in=ProfessorCourses.objects.filter(professor_id=professor_id).values('course_id')
+                ).values_list('name', flat=True)
                 
                 # Return the averages in the required format using DRF's Response
                 # Pass the data to the serializer
@@ -296,7 +296,7 @@ def fetch_overall_rating(request):
                     'interactions_with_students': aggregated_data['interactions_with_students_avg'],
                     'hardness': aggregated_data['hardness_avg'],
                     'feedback': feedback_list,
-                    'courses': list()
+                    'courses': courses
                 })
                 
                 if serializer.is_valid():
@@ -311,3 +311,31 @@ def fetch_overall_rating(request):
             return Response({'error': str(e)}, status=500)
 
     return Response({'error': 'professor_id parameter is required'}, status=400)
+
+@api_view(['POST'])
+def assign_course_to_professor(request):
+    serializer = AssignCourseSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        professor_id = serializer.validated_data['professor_id']
+        course_id = serializer.validated_data['course_id']
+
+        # Retrieve the Professor and Course instances
+        try:
+            professor = Professors.objects.get(id=professor_id)
+            course = Courses.objects.get(id=course_id)
+        except Professors.DoesNotExist:
+            return Response({'error': 'Professor not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if the assignment already exists
+        if ProfessorCourses.objects.filter(professor_id=professor, course_id=course).exists():
+            return Response({'error': 'This course is already assigned to the professor'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the assignment
+        ProfessorCourses.objects.create(professor_id=professor, course_id=course)
+        
+        return Response({'message': 'Course assigned to professor successfully'}, status=status.HTTP_201_CREATED)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -7,9 +7,9 @@ class Courses(models.Model):
         ('Active', 'Active'),
         ('Inactive', 'Inactive'),
     ]
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    status = models.CharField(max_length=8, choices=STATUS_CHOICE, default='Active')
+    id = models.AutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=50, db_column='Name')
+    status = models.CharField(max_length=8, choices=STATUS_CHOICE, default='Active', db_column='Status')
 
     def __str__(self):
         return self.name
@@ -19,8 +19,8 @@ class Courses(models.Model):
 
 
 class Departments(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
+    id = models.AutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=50, db_column='Name')
 
     def __str__(self):
         return self.name
@@ -103,8 +103,8 @@ class Professors(models.Model):
         
 
 class ProfessorCourses(models.Model):
-    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE)
-    professor_id = models.ForeignKey(Professors, on_delete=models.CASCADE)
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, db_column='CourseID')
+    professor_id = models.ForeignKey(Professors, on_delete=models.CASCADE, db_column='ProfessorID')
 
     class Meta:
         db_table = 'ProfessorCourses'

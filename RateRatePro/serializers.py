@@ -56,3 +56,16 @@ class ProfessorRatingsSerializer(serializers.Serializer):
         # Logic for updating an entry if needed (optional for this use case)
         return instance
 
+class AssignCourseSerializer(serializers.Serializer):
+    professor_id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+
+    def validate_professor_id(self, value):
+        if not Professors.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Invalid professor ID")
+        return value
+
+    def validate_course_id(self, value):
+        if not Courses.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Invalid course ID")
+        return value
