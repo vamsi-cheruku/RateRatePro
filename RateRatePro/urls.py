@@ -19,6 +19,7 @@ urlpatterns = [
     path('v1/rating/post/', views.post_rating, name='post_rating'), # For posting a rating for a professor
     path('v1/rating/fetch/', views.get_professor_ratings, name='get_rating'), # For updating a rating for a professor
     path('v1/fetch/overallrating/', views.fetch_overall_rating, name='get_overall_rating'), # For fetching overrall rating of a professor
+    path('v1/ratings/student/', views.get_ratings_by_student, name='get_ratings_by_student'), # For fetchingthe list of ratings given by a student
     
     #! API endpoints for managing courses
     path('v1/course/create', views.create_course, name='create_course'), # For creating a new course

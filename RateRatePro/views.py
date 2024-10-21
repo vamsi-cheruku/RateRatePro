@@ -266,7 +266,7 @@ def fetch_overall_rating(request):
             if ratings.exists():
                 # Calculate averages for the relevant fields
                 aggregated_data = ratings.aggregate(
-                    overall_rating_avg=Avg('overall_rating'),
+                    overall_rating_avg=round(Avg('overall_rating'),2),
                     would_take_again_count_1=Count(Case(When(would_take_again='1', then=1))),
                     would_take_again_count_0=Count(Case(When(would_take_again='0', then=1))),
                     academic_ability_avg=Avg('academic_ability'),
@@ -339,3 +339,18 @@ def assign_course_to_professor(request):
         return Response({'message': 'Course assigned to professor successfully'}, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_ratings_by_student(request):
+    student_id = request.query_params.get('student_id')  # Extract student_id from query parameters
+    if not student_id:
+        return Response({"error": "student_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Fetch ratings for the given student_id
+        ratings = Ratings.objects.filter(student_id=student_id)
+        # Serialize the ratings data
+        serializer = RatingsSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Ratings.DoesNotExist:
+        return Response({"message": "No ratings found for the student."}, status=status.HTTP_404_NOT_FOUND)
