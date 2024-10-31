@@ -69,3 +69,16 @@ class AssignCourseSerializer(serializers.Serializer):
         if not Courses.objects.filter(id=value).exists():
             raise serializers.ValidationError("Invalid course ID")
         return value
+    
+class ProfessorRatingsComparisonSerializer(serializers.Serializer):
+    professor_1 = serializers.DictField(child=serializers.FloatField(), required=True)
+    professor_2 = serializers.DictField(child=serializers.FloatField(), required=True)
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    new_password =  serializers.CharField(required=True, min_length=8, max_length=12)
+    
+    def validate_email(self, value):
+        if not Users.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Invalid email")
+        return value
