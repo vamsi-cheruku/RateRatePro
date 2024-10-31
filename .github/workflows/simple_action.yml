@@ -9,7 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: prinitng step
+      - name: Print variables
+        env:
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          OPENSEARCH_PASSWORD: ${{ secrets.OPENSEARCH_PASSWORD }}
+          AWS_ENDPOINT : ${{vars.AWS_ENDPOINT}}
         run: |
           ls -al
   trail-job-run2:
