@@ -1,0 +1,14 @@
+name: pjn is trying to setup CICD
+
+on:
+  push
+
+jobs:
+  trail-job-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: prinitng step
+        run: |
+          ls -al
