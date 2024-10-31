@@ -12,3 +12,11 @@ jobs:
       - name: prinitng step
         run: |
           ls -al
+  trail-job-run2:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 2nd prinitng step 
+        run: |
+          dir
