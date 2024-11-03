@@ -47,6 +47,8 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 ROOT_URLCONF = "RateRatePro.urls"
 
 TEMPLATES = [
@@ -79,14 +81,14 @@ DATABASES = {
         'NAME': 'test_rateratepro',
         
         #! MySQL crediantial for localhost
-        'USER': 'root',
-        'PASSWORD': 'Cheruku@0627',
-        'HOST': 'localhost',  # or '127.0.0.1' for development
+        #'USER': 'root',
+        #'PASSWORD': 'Cheruku@0627',
+        #'HOST': 'localhost',  # or '127.0.0.1' for development
         
         #! MySQL credintials for AWS
-        # 'USER': 'admin',
-        # 'PASSWORD': 'rootadmin',
-        # 'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
+        'USER': 'admin',
+        'PASSWORD': 'rootadmin',
+        'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
         'PORT': '3306',  # default MySQL port
 
     }

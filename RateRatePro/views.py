@@ -2,6 +2,8 @@ import json
 # from .elasticsearch import *
 import logging
 
+from better_profanity import profanity
+from django.contrib.auth.hashers import make_password
 from django.db.models import Avg, Case, Count, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -10,7 +12,6 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.hashers import make_password
 
 from .constants import esconsts
 from .models import *
@@ -204,32 +205,35 @@ def create_department(request):
 def post_rating(request):
     if request.method == 'POST':
         body = json.loads(request.body)
-        course_id = body.get('course_id') # Course ID to which the rating pertains
-        student_id =  body.get('student_id') # Student ID who is giving the rating
-        professor_id =  body.get('professor_id') # Professor ID being rated
-        
+        course_id = body.get('course_id')
+        student_id = body.get('student_id')
+        professor_id = body.get('professor_id')
+        feedback = body.get('feedback', '')  # Assuming you have a comment field in the request body
+
         # Required fields
         required_fields = ['course_id', 'student_id', 'professor_id']
-        
+
         # Check for missing fields
         missing_fields = [field for field in required_fields if body.get(field) is None]
         if missing_fields:
             return Response({'error': f"{', '.join(missing_fields)} is required."}, status=status.HTTP_400_BAD_REQUEST)
-    
-        # Check if student is registed in the course
+
+        # Check if student is registered in the course
         if not StudentCourses.objects.filter(student_id=student_id, course_id=course_id).exists():
             return Response({'error': 'You must be registered in this course to give a rating.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # Profanity check
+        if profanity.contains_profanity(feedback):
+            return Response({'error': 'Your comment contains inappropriate language.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Insert rating in Ratings table
-        serializer = RatingsSerializer(data = request.data)
+        serializer = RatingsSerializer(data=body)  # Use body instead of request.data
         if serializer.is_valid():
-            serializer.save()  # Insert data into Ratings table
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
+
         error_message = list(serializer.errors.values())[0][0]
         return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(['GET'])
 def get_professor_ratings(request):
     try:

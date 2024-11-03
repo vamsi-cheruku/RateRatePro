@@ -9,3 +9,5 @@ elasticsearch-dsl==8.15.3
 
 mysqlclient==2.2.4
 opensearch-py==2.7.1
+
+profanity
