@@ -427,3 +427,21 @@ def get_ratings_by_student(request):
 #         except Users.DoesNotExist:
 #             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def professor_courses(request):
+    # Get the professor_id from query parameters
+    professor_id = request.query_params.get('professor_id')
+
+    if not professor_id:
+        return Response({"error": "Professor ID not provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        courses = list(Courses.objects.filter(
+                    id__in=ProfessorCourses.objects.filter(professor_id=professor_id).values('course_id')
+                ).values('id', 'name', 'status'))
+        
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Professors.DoesNotExist:
+        return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
