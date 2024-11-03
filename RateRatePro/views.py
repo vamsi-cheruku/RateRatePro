@@ -254,19 +254,18 @@ def get_professor_ratings(request):
 
 @api_view(['GET'])
 def fetch_overall_rating(request):
-    professor_id = request.GET.get('professor_id')  # Get ProfID from query parameters
-    course_id = request.GET.get('course_id')  # Optionally get CourseID if needed
+    professor_id = request.GET.get('professor_id')
+    course_id = request.GET.get('course_id')
 
     if professor_id:
         try:
-            # Fetch ratings for the given ProfID and optionally CourseID
+            # Filter ratings for professor, optionally by course
             ratings = Ratings.objects.filter(professor_id=professor_id)
-            
             if course_id:
                 ratings = ratings.filter(course_id=course_id)
 
             if ratings.exists():
-                # Calculate averages for the relevant fields
+                # Aggregate ratings
                 aggregated_data = ratings.aggregate(
                     overall_rating_avg=Avg('overall_rating'),
                     would_take_again_count_1=Count(Case(When(would_take_again='1', then=1))),
@@ -277,34 +276,32 @@ def fetch_overall_rating(request):
                     hardness_avg=Avg('hardness')
                 )
 
-                # Fetch a maximum of 3 feedback entries
                 feedback_list = list(ratings.values_list('feedback', flat=True)[:3])
+                would_take_again_counts = {
+                    '1': aggregated_data['would_take_again_count_1'],
+                    '0': aggregated_data['would_take_again_count_0']
+                }
                 
-                # Combine would_take_again counts into a list
-                would_take_again_counts = {'1':aggregated_data['would_take_again_count_1'], '0':aggregated_data['would_take_again_count_0']}
-                
-                # Fetch the list of courses that the professor is teaching
-                courses = Courses.objects.filter(
+                # Fetch related courses as a list of dictionaries
+                courses = list(Courses.objects.filter(
                     id__in=ProfessorCourses.objects.filter(professor_id=professor_id).values('course_id')
-                ).values_list('name', flat=True)
-                
-                # Return the averages in the required format using DRF's Response
-                # Pass the data to the serializer
-                serializer = ProfessorRatingsSerializer(data={
-                    'overall_rating': round(aggregated_data['overall_rating_avg'],2),
+                ).values('id', 'name', 'status'))
+
+                # Combine aggregated data and additional info
+                response_data = {
+                    'overall_rating': round(aggregated_data['overall_rating_avg'], 2),
                     'would_take_again': would_take_again_counts,
-                    'academic_ability': aggregated_data['academic_ability_avg'],
-                    'teaching_ability': aggregated_data['teaching_ability_avg'],
-                    'interactions_with_students': aggregated_data['interactions_with_students_avg'],
-                    'hardness': aggregated_data['hardness_avg'],
+                    'academic_ability': round(aggregated_data['academic_ability_avg'], 2),
+                    'teaching_ability': round(aggregated_data['teaching_ability_avg'], 2),
+                    'interactions_with_students': round(aggregated_data['interactions_with_students_avg'], 2),
+                    'hardness': round(aggregated_data['hardness_avg'], 2),
                     'feedback': feedback_list,
-                    'courses': courses
-                })
-                
-                if serializer.is_valid():
-                    return Response(serializer.data, status=200)
-                else:
-                    return Response(serializer.errors, status=400)
+                    'courses': courses  # Pass list of dictionaries directly
+                }
+
+                # Serialize response data
+                serializer = ProfessorRatingsSerializer(response_data)
+                return JsonResponse(response_data, safe=False, status=200)
 
             else:
                 return Response({'error': 'No ratings found for this professor'}, status=404)
@@ -313,7 +310,6 @@ def fetch_overall_rating(request):
             return Response({'error': str(e)}, status=500)
 
     return Response({'error': 'professor_id parameter is required'}, status=400)
-
 @api_view(['GET'])
 def compare_professors(request):
     professor_id1 = request.GET.get('professor_id1')  # First professor ID
