@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.core.exceptions import ObjectDoesNotExist 
 
 from .constants import esconsts
 from .models import *
@@ -85,7 +86,7 @@ def fetch_user(request):
             user = Users.objects.get(id=userid)
             serializer = UserResponseSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Users.DoesNotExist:
+        except ObjectDoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except ValidationError as e:
             # Catch validation errors and format the response
