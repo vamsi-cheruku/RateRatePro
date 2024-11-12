@@ -38,23 +38,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Grant permissions to test user
-      run: |
-        mysql -h mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS test_test_db;"
-        mysql -h mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "GRANT ALL PRIVILEGES ON test_test_db.* TO 'test_user'@'%';"
-        mysql -h mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "FLUSH PRIVILEGES;"
-
     - name: Wait for MySQL to be ready
       run: |
-        until mysql -h mysql -u root -p${{ secrets.MYSQL_PASSWORD }} -e "SELECT 1"; do
+        until mysql -h 127.0.0.1 -u root -p${{ secrets.MYSQL_PASSWORD }} -e "SELECT 1"; do
           echo "Waiting for MySQL to be ready..."
           sleep 5
         done
 
+    - name: Grant permissions to test user
+      run: |
+        mysql -h 127.0.0.1 -u root -p${{ secrets.MYSQL_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS test_test_db;"
+        mysql -h 127.0.0.1 -u root -p${{ secrets.MYSQL_PASSWORD }} -e "GRANT ALL PRIVILEGES ON test_test_db.* TO 'test_user'@'%';"
+        mysql -h 127.0.0.1 -u root -p${{ secrets.MYSQL_PASSWORD }} -e "FLUSH PRIVILEGES;"
+
     - name: Run Django migrations
       run: |
-        python manage.py migrate
+        python manage.py migrate  # Apply migrations to create tables
 
     - name: Run tests
       run: |
-        python manage.py test
+        python manage.py test  # Run tests after migration
