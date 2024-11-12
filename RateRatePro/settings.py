@@ -2,6 +2,11 @@ import logging
 import os
 from pathlib import Path
 
+import environ
+
+env = environ.Env()
+environ.Env.read_env() 
+
 logging.basicConfig(level=logging.DEBUG)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -76,8 +81,6 @@ WSGI_APPLICATION = "RateRatePro.wsgi.application"
 
 DATABASES = {
     "default": {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'test_rateratepro',
         
@@ -92,10 +95,11 @@ DATABASES = {
         # 'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
         # 'PORT': '3306',  # default MySQL port
         
-        'NAME': os.getenv('DATABASE_NAME', 'default_db_name'),
-        'USER': os.getenv('DATABASE_USER', 'default_user'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'default_password'),
-        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'NAME': env('DB_NAME', default='test_database'),  # Use the database name
+        'USER': env('DB_USER', default='root'),  # MySQL user (default 'root')
+        'PASSWORD': env('DB_PASSWORD', default='Cheruku@0627'),  # MySQL password
+        'HOST': env('DB_HOST', default='localhost'),  # MySQL host (default 'localhost')
+        'PORT': env('DB_PORT', default='3306'),  # MySQL port (default 3306)
     }
 }
 
