@@ -157,3 +157,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+OPTIONS = {
+    'unix_socket': '/var/run/mysqld/mysqld.sock',  # Update with actual socket path if different
+}
