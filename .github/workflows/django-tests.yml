@@ -1,6 +1,12 @@
-name: Django Tests
+name: Django CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
@@ -8,40 +14,48 @@ jobs:
 
     services:
       mysql:
-        image: mysql:latest
+        image: mysql:8
         env:
-          MYSQL_DATABASE: test_db  # Change as needed
-          MYSQL_USER: test_user    # Change as needed
-          MYSQL_PASSWORD: test_pass
-          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: password
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+        options: --health-cmd="mysqladmin ping --silent" --health-timeout=30s --health-start-period=5s --health-retries=3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'  # Specify your Python version
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run migrations and tests
-        env:
-          DB_NAME: test_db
-          DB_USER: test_user
-          DB_PASSWORD: test_pass
-          DB_HOST: 127.0.0.1  # Host should be the same as the MySQL service host
-        run: |
-          python manage.py migrate
-          python manage.py test
+    - name: Grant permissions to test user
+      run: |
+        mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS test_test_db;"
+        mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "GRANT ALL PRIVILEGES ON test_test_db.* TO 'test_user'@'localhost';"
+        mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "FLUSH PRIVILEGES;"
+
+    - name: Wait for MySQL to be ready
+      run: |
+        until mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -h 127.0.0.1 -e "SELECT 1"; do
+          echo "Waiting for MySQL to be ready..."
+          sleep 5
+        done
+
+    - name: Run Django migrations
+      run: |
+        python manage.py migrate
+
+    - name: Run tests
+      run: |
+        python manage.py test
+
