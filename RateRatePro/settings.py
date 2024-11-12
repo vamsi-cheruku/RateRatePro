@@ -95,7 +95,7 @@ DATABASES = {
         # 'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
         # 'PORT': '3306',  # default MySQL port
         
-        'NAME': env('DB_NAME', default='test_database'),  # Use the database name
+        'NAME': env('DB_NAME', default='test_rateratepro'),  # Use the database name
         'USER': env('DB_USER', default='root'),  # MySQL user (default 'root')
         'PASSWORD': env('DB_PASSWORD', default='Cheruku@0627'),  # MySQL password
         'HOST': env('DB_HOST', default='localhost'),  # MySQL host (default 'localhost')

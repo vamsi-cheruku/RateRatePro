@@ -17,7 +17,7 @@ jobs:
         image: mysql:8.0  # MySQL image
         env:
           MYSQL_ROOT_PASSWORD: 'Cheruku@0627'  # MySQL root password
-          MYSQL_DATABASE: 'test_testcases'  # The database for the tests
+          MYSQL_DATABASE: 'test_rateratepro'  # The database for the tests
         ports:
           - 3306:3306  # Expose port 3306 for MySQL
         options: >-
