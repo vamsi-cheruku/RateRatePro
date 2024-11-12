@@ -3,61 +3,44 @@ name: Django CI
 on:
   push:
     branches:
-      - main  # Run the tests on pushes to the main branch
-  pull_request:
-    branches:
-      - main  # Run tests on pull requests to the main branch
+      - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest  # The environment to run the tests in
+  test-cases:
+    runs-on: ubuntu-latest
 
     services:
       mysql:
-        image: mysql:8.0  # MySQL image
+        image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: 'Cheruku@0627'  # MySQL root password
-          MYSQL_DATABASE: 'test_rateratepro'  # The database for the tests
+          MYSQL_ROOT_PASSWORD: Cheruku@0627
+          MYSQL_DATABASE: test_rateratepro
+          MYSQL_USER: root
+          MYSQL_PASSWORD: Cheruku@0627
         ports:
-          - 3306:3306  # Expose port 3306 for MySQL
-        options: >-
-          --health-cmd="mysqladmin ping --host=localhost --user=root --password=$MYSQL_ROOT_PASSWORD"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'  # Choose your desired Python version
-
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Install your project dependencies
-
-      # Step 4: Wait for MySQL to be ready (optional)
-      - name: Wait for MySQL to be ready
-        run: |
-          until mysqladmin -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD ping --silent; do
-            echo "Waiting for MySQL..."
-            sleep 2
-          done
-
-      # Step 5: Set up the Django database (migrate and create test DB)
-      - name: Set up Django database
-        run: |
-          python manage.py migrate  # Apply migrations
-          python manage.py test  # Run the tests
-
-      # Step 6: Run tests
-      - name: Run tests
-        run: |
-          python manage.py test  # Run Django tests to ensure everything works
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {1..10}; do
+          mysqladmin ping -h 127.0.0.1 --user=root --password=rootpassword --silent && break
+          echo "Waiting for MySQL to be ready..."
+          sleep 5
+        done
+    - name: Run migrations
+      run: |
+        python manage.py migrate
+    - name: Run tests
+      run: |
+        python manage.py test
