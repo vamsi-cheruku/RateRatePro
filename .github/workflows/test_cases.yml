@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  test-cases:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -14,12 +14,12 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: Cheruku@0627
-          MYSQL_DATABASE: test_rateratepro
+          MYSQL_DATABASE: test_rateratpro
           MYSQL_USER: root
           MYSQL_PASSWORD: Cheruku@0627
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=10 --start-period=30s
 
     steps:
     - uses: actions/checkout@v3
@@ -34,7 +34,7 @@ jobs:
     - name: Wait for MySQL to be ready
       run: |
         for i in {1..10}; do
-          mysqladmin ping -h 127.0.0.1 --user=root --password=rootpassword --silent && break
+          mysqladmin ping -h 127.0.0.1 --user=root --password=Cheruku@0627 --silent && break
           echo "Waiting for MySQL to be ready..."
           sleep 5
         done
