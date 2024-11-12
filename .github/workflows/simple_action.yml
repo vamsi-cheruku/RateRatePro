@@ -1,26 +1,55 @@
-name: pjn is trying to setup CICD
+name: Django CI
 
 on:
-  push
+  push:
+    branches:
+      - main  # Run on pushes to the main branch; change this if you want to run on other branches
+  pull_request:
+    branches:
+      - main  # Run on pull requests to the main branch
 
 jobs:
-  trail-job-run:
+  test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Print variables
+    services:
+      postgres:
+        image: postgres:13
         env:
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          OPENSEARCH_PASSWORD: ${{ secrets.OPENSEARCH_PASSWORD }}
-          AWS_ENDPOINT : ${{vars.AWS_ENDPOINT}}
-        run: |
-          ls -al
-  trail-job-run2:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd="pg_isready -U test_user"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-      - name: 2nd prinitng step 
+    env:
+      DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+      DEBUG: 'False'
+      DJANGO_SETTINGS_MODULE: RateRatePro.settings
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # Specify your Python version here
+
+      - name: Install dependencies
         run: |
-          dir
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        run: |
+          python manage.py test

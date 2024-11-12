@@ -34,9 +34,14 @@ class Ratings(models.Model):
         ('0', '0'),
         ('1', '1')
     ]
+    WOULD_TAKE_AGAIN = [
+        ('0', 'No'),
+        ('1', 'Yes')
+    ]
     id = models.AutoField(primary_key=True)
     overall_rating = models.FloatField(null=True, blank=True, db_column='OverallRating')
-    would_take_again = models.FloatField(null=True, blank=True, db_column='WouldTakeAgain')
+    # would_take_again = models.FloatField(null=True, blank=True, db_column='WouldTakeAgain')
+    would_take_again = models.CharField(max_length=1, choices=WOULD_TAKE_AGAIN, db_column='WouldTakeAgain', default='0')
     academic_ability = models.FloatField(null=True, blank=True, db_column='AcademicAbility')
     teaching_ability = models.FloatField(null=True, blank=True, db_column='TeachingAbility')
     interactions_with_students = models.FloatField(null=True, blank=True, db_column='InteractionsWithStudents')

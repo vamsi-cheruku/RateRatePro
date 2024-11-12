@@ -4,6 +4,7 @@ import logging
 
 from better_profanity import profanity
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Case, Count, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -12,7 +13,6 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.core.exceptions import ObjectDoesNotExist 
 
 from .constants import esconsts
 from .models import *
@@ -39,7 +39,7 @@ def create_user(request):
                         return Response({'error': 'Department ID is required for Professors.'},status=status.HTTP_400_BAD_REQUEST)
 
                     department = Departments.objects.get(id=department_id)
-                    # profid = Users.objects.get(user.id)
+                    # profid = Users.objects.g et(user.id)
                     professor = Professors.objects.create(
                         id = user,
                         department_id = department,
@@ -64,7 +64,6 @@ def create_user(request):
                 index_user(index_name, user.id, user_document)  # Insert data into Elasticsearch index
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                logging.error("Error while creating user in Elasticsearch: {}".format(e))
                 return Response({'error': 'Something went wrong while creating user'}, status=status.HTTP_400_BAD_REQUEST)
         
         if serializer.errors:
@@ -94,24 +93,26 @@ def fetch_user(request):
 
 @api_view(['POST'])
 def authenticate_user(request):
-    if request.method == 'POST':
-        body = json.loads(request.body)
-        username = body.get('username')
-        password = body.get('password')
+    print("********* AUTHENTICATE USER VIEW CALLED ***********")
+    username = request.data.get('username')
+    password = request.data.get('password')
+    # Ensure both username and password are provided
+    if not username or not password:
+        return Response({'error': 'Username or password not provided'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Check if a user with the provided email (username) exists
+        user = Users.objects.get(email=username)
         
-        # logic to check if username/email is already in use and then check if password is correct
-        if username and password:
-            try:
-                user = Users.objects.get(email = username)
-                if user.password == password:
-                    serializer = UserInputSerializer(user)
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
-            except Users.DoesNotExist:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Directly compare the stored plain text password (since hashing is not being used)
+        if user.password == password:
+            serializer = UserInputSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Username or password not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    except Users.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
         
 # Function to search users for the given search query
@@ -147,7 +148,6 @@ def search_users(request):
         )
         
         # Format the search results for the response
-        print("SEARCH HITS FOR QUERY ", search_query, " IS : ", search_results)
         users = []
         for hit in search_results['hits']['hits']:
             user_data = hit['_source']
@@ -171,6 +171,7 @@ def create_course(request):
 
 @api_view(['POST'])
 def add_student_in_course(request):
+    print("********** REGISTER STUDENT IN COURSE API VIEW CALLED *************")
     if request.method == 'POST':
         body = json.loads(request.body)
         course_id = body.get('course_id')
@@ -232,9 +233,10 @@ def post_rating(request):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         error_message = list(serializer.errors.values())[0][0]
+        print("########## error message: "+error_message)
         return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+    
 @api_view(['GET'])
 def get_professor_ratings(request):
     try:

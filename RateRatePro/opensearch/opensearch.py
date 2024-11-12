@@ -12,7 +12,6 @@ client = OpenSearch(
 #* Function to create an index if it does not exist.
 def create_user_index(index_name):
     if not client.indices.exists(index = index_name):
-        logging.debug("Users index not exits")
         client.indices.create(
             index=index_name,
             body={
