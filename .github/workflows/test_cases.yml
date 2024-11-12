@@ -11,30 +11,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       mysql:
-        image: mysql:8
+        image: mysql:latest
         env:
-          MYSQL_DATABASE: test_rateratepro
-          MYSQL_USER: test_user       # Temporary MySQL user for GitHub Actions
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
           MYSQL_PASSWORD: test_password
-          MYSQL_ROOT_PASSWORD: root_password
         ports:
-          - "3306:3306"
+          - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u test_user --password=test_password"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    env:
-      DATABASE_URL: mysql://test_user:test_password@127.0.0.1:3306/test_rateratepro
-      DEBUG: 'False'
-      DJANGO_SETTINGS_MODULE: RateRatePro.settings
+          --health-cmd "mysqladmin ping --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
 
     steps:
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -47,16 +41,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for MySQL
-        run: |
-          until mysqladmin ping -h 127.0.0.1 -u test_user --password=test_password; do
-            sleep 5
-          done
-
-      - name: Run migrations
+      - name: Run Migrations
+        env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_NAME: test_db
+          DATABASE_USER: test_user
+          DATABASE_PASSWORD: test_password
         run: |
           python manage.py migrate
 
-      - name: Run tests
+      - name: Run Tests
+        env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_NAME: test_db
+          DATABASE_USER: test_user
+          DATABASE_PASSWORD: test_password
         run: |
           python manage.py test

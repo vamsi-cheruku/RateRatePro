@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 logging.basicConfig(level=logging.DEBUG)
@@ -81,16 +82,20 @@ DATABASES = {
         'NAME': 'test_rateratepro',
         
         #! MySQL crediantial for localhost
-        'USER': 'root',
-        'PASSWORD': 'Cheruku@0627',
-        'HOST': 'localhost',  # or '127.0.0.1' for development
+        # 'USER': 'root',
+        # 'PASSWORD': 'Cheruku@0627',
+        # 'HOST': 'localhost',  # or '127.0.0.1' for development
         
         #! MySQL credintials for AWS
         # 'USER': 'admin',
         # 'PASSWORD': 'rootadmin',
         # 'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
-        'PORT': '3306',  # default MySQL port
-
+        # 'PORT': '3306',  # default MySQL port
+        
+        'NAME': os.getenv('DATABASE_NAME', 'default_db_name'),
+        'USER': os.getenv('DATABASE_USER', 'default_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'default_password'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
     }
 }
 
