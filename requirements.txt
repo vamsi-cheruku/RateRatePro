@@ -11,3 +11,4 @@ mysqlclient==2.2.4
 opensearch-py==2.7.1
 
 better_profanity
+python-dotenv
