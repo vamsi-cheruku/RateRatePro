@@ -14,10 +14,8 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: Cheruku@0627
+          MYSQL_ROOT_PASSWORD: Cheruku@0627  # Root password
           MYSQL_DATABASE: test_rateratpro
-          MYSQL_USER: root
-          MYSQL_PASSWORD: Cheruku@0627
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=10
@@ -51,3 +49,12 @@ jobs:
             echo "Waiting for MySQL..."
             sleep 5
           fi
+        done
+
+    - name: Run migrations
+      run: |
+        python manage.py migrate
+
+    - name: Run tests
+      run: |
+        python manage.py test
