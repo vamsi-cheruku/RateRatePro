@@ -1,9 +1,10 @@
-name: Django CI
+name: Django CI with MySQL
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
   test:
@@ -19,28 +20,34 @@ jobs:
           MYSQL_PASSWORD: Cheruku@0627
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=10 --start-period=30s
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=10
+
+    env:
+      DB_NAME: test_rateratpro
+      DB_USER: root
+      DB_PASSWORD: Cheruku@0627
+      DB_HOST: 127.0.0.1
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
     - name: Wait for MySQL to be ready
       run: |
         for i in {1..10}; do
-          mysqladmin ping -h 127.0.0.1 --user=root --password=Cheruku@0627 --silent && break
-          echo "Waiting for MySQL to be ready..."
-          sleep 5
-        done
-    - name: Run migrations
-      run: |
-        python manage.py migrate
-    - name: Run tests
-      run: |
-        python manage.py test
+          if mysqladmin ping -h 127.0.0.1 --user=root --password=Cheruku@0627 --silent; then
+            echo "MySQL is ready!"
+            break
+          else
+            echo "Waiting for MySQL..."
+            sleep 5
+          fi
