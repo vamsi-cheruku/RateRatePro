@@ -3,7 +3,7 @@ name: Django CI
 on:
   push:
     branches:
-      - main  # Run on pushes to the main branch; change this if you want to run on other branches
+      - main  # Run on pushes to the main branch
   pull_request:
     branches:
       - main  # Run on pull requests to the main branch
@@ -16,20 +16,20 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: test_password
-          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: test_rateratepro
+          MYSQL_USER: root
+          MYSQL_PASSWORD: Cheruku@0627
+          MYSQL_ROOT_PASSWORD: Cheruku@0627
         ports:
           - "3306:3306"
         options: >-
-          --health-cmd="mysqladmin ping -u test_user --password=test_password"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root --password=Cheruku@0627"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
     env:
-      DATABASE_URL: mysql://test_user:test_password@localhost:3306/test_db
+      DATABASE_URL: mysql://root:Cheruku@0627@127.0.0.1:3306/test_db
       DEBUG: 'False'
       DJANGO_SETTINGS_MODULE: RateRatePro.settings
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Wait for MySQL
         run: |
-          until mysqladmin ping -h 127.0.0.1 -u test_user --password=test_password; do
+          until mysqladmin ping -h 127.0.0.1 -u root --password=root_password; do
             sleep 5
           done
 
