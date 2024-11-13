@@ -16,10 +16,8 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_ROOT_PASSWORD: my_password
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: root
-          MYSQL_PASSWORD: my_password
+          MYSQL_ROOT_PASSWORD: my_password  # Only set this for root user
+          MYSQL_DATABASE: test_db           # Your database name
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=10s --health-retries=5
@@ -48,12 +46,7 @@ jobs:
       - name: Grant permissions to root user
         run: |
           mysql -h 127.0.0.1 -u root -pmy_password -e "CREATE DATABASE IF NOT EXISTS test_db;"
-          mysql -h 127.0.0.1 -u root -pmy_password -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'my_password';"
           mysql -h 127.0.0.1 -u root -pmy_password -e "FLUSH PRIVILEGES;"
-
-      - name: View MySQL container logs
-        run: |
-          docker logs $(docker ps -q --filter ancestor=mysql)
 
       - name: Run Django migrations
         run: |
