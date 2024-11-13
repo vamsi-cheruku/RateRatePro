@@ -16,8 +16,10 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_ROOT_PASSWORD: my_password  # Only set this for root user
-          MYSQL_DATABASE: test_db           # Your database name
+          MYSQL_ROOT_PASSWORD: rootadmin  # Root password (update with your actual password)
+          MYSQL_DATABASE: test_rateratepro_test  # Your test database name
+          MYSQL_USER: admin  # Database user (match your settings)
+          MYSQL_PASSWORD: rootadmin  # Database user password (match your settings)
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=10s --health-retries=5
@@ -40,17 +42,25 @@ jobs:
         run: |
           export $(cat .env | xargs)
 
+      - name: Set database environment variables
+        run: |
+          echo "DB_NAME=test_rateratepro_test" >> $GITHUB_ENV
+          echo "DB_USER=admin" >> $GITHUB_ENV
+          echo "DB_PASSWORD=rootadmin" >> $GITHUB_ENV
+          echo "DB_HOST=rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV  # Change to your RDS hostname
+          echo "DB_PORT=3306" >> $GITHUB_ENV
+
       - name: Wait for MySQL to be ready
         run: |
-          until mysql -h 127.0.0.1 -u root -pmy_password -e "SELECT 1"; do
+          until mysql -h 127.0.0.1 -u admin -prootadmin -e "SELECT 1"; do
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done
 
       - name: Grant permissions to root user and create database
         run: |
-          mysql -h 127.0.0.1 -u root -pmy_password -e "CREATE DATABASE IF NOT EXISTS test_db;"
-          mysql -h 127.0.0.1 -u root -pmy_password -e "FLUSH PRIVILEGES;"
+          mysql -h 127.0.0.1 -u admin -prootadmin -e "CREATE DATABASE IF NOT EXISTS test_rateratepro_test;"
+          mysql -h 127.0.0.1 -u admin -prootadmin -e "FLUSH PRIVILEGES;"
 
       - name: Run Django migrations
         run: |
