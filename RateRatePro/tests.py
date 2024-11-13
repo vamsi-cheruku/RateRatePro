@@ -169,4 +169,3 @@ class RatingAPITestCase(TransactionTestCase):
     #         'course_id': self.course.id
     #     })
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertIn('overall_rating', response.data)

@@ -1,71 +1,61 @@
-name: Django CI
+name: Django CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger the pipeline on pushes to the 'main' branch.
   pull_request:
     branches:
-      - main
+      - main  # Trigger the pipeline on pull requests to the 'main' branch.
 
 jobs:
+  # Job for setting up Python, installing dependencies, running tests, and building the application
   test:
-    runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: rootadmin  # Root password (update with your actual password)
-          MYSQL_DATABASE: test_rateratepro_test  # Your test database name
-          MYSQL_USER: admin  # Database user (match your settings)
-          MYSQL_PASSWORD: rootadmin  # Database user password (match your settings)
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=10s --health-retries=5
+    runs-on: ubuntu-latest  # Use Ubuntu as the operating system
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2  # Check out the repository code
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'  # Set the Python version
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt  # Install your project dependencies
 
-      - name: Load environment variables from .env file
-        run: |
-          export $(cat .env | xargs)
+    - name: Set up the database (e.g., SQLite for testing)
+      run: |
+        python manage.py migrate  # Apply migrations to set up the database
+        python manage.py createcachetable  # Create the cache tables if you're using caching
 
-      - name: Set database environment variables
-        run: |
-          echo "DB_NAME=test_rateratepro_test" >> $GITHUB_ENV
-          echo "DB_USER=admin" >> $GITHUB_ENV
-          echo "DB_PASSWORD=rootadmin" >> $GITHUB_ENV
-          echo "DB_HOST=rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV  # Change to your RDS hostname
-          echo "DB_PORT=3306" >> $GITHUB_ENV
+    - name: Run tests
+      run: |
+        source venv/bin/activate
+        python manage.py test  # Run the tests defined in your Django app
 
-      - name: Wait for MySQL to be ready
-        run: |
-          until mysql -h 127.0.0.1 -u admin -prootadmin -e "SELECT 1"; do
-            echo "Waiting for MySQL to be ready..."
-            sleep 5
-          done
+  # Deployment job (if needed)
+  # deploy:
+  #   runs-on: ubuntu-latest  # Use Ubuntu as the operating system
+  #   needs: test  # This job will only run if the tests pass
 
-      - name: Grant permissions to root user and create database
-        run: |
-          mysql -h 127.0.0.1 -u admin -prootadmin -e "CREATE DATABASE IF NOT EXISTS test_rateratepro_test;"
-          mysql -h 127.0.0.1 -u admin -prootadmin -e "FLUSH PRIVILEGES;"
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2  # Check out the repository code
 
-      - name: Run Django migrations
-        run: |
-          python manage.py migrate
-
-      - name: Run tests
-        run: |
-          python manage.py test
+  #   - name: Deploy to server (example: using SSH)
+  #     run: |
+  #       ssh -o StrictHostKeyChecking=no user@your_server_ip <<EOF
+  #       cd /path/to/your/project
+  #       git pull origin main  # Pull the latest changes
+  #       source venv/bin/activate  # Activate virtual environment
+  #       pip install -r requirements.txt  # Install dependencies
+  #       python manage.py migrate  # Run migrations
+  #       python manage.py collectstatic --noinput  # Collect static files for production
+  #       systemctl restart your-web-server  # Restart your web server (e.g., Gunicorn)
+  #       EOF

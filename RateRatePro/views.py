@@ -23,6 +23,7 @@ from .serializers import *
 @api_view(['POST'])
 def create_user(request):
     if request.method == 'POST':
+        print("*****CREATE USER VIEW CALLED *******")
         serializer = UserInputSerializer(data = request.data)
         if serializer.is_valid():
             user = serializer.save()  # Insert data into User table
