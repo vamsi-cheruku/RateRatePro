@@ -3,59 +3,30 @@ name: Django CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger the pipeline on pushes to the 'main' branch.
-  pull_request:
-    branches:
-      - main  # Trigger the pipeline on pull requests to the 'main' branch.
+      - main
 
 jobs:
-  # Job for setting up Python, installing dependencies, running tests, and building the application
   test:
-    runs-on: ubuntu-latest  # Use Ubuntu as the operating system
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # Check out the repository code
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'  # Set the Python version
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install --upgrade pip
-        pip install -r requirements.txt  # Install your project dependencies
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-    - name: Set up the database (e.g., SQLite for testing)
+    - name: Apply migrations
       run: |
-        python manage.py migrate  # Apply migrations to set up the database
-        python manage.py createcachetable  # Create the cache tables if you're using caching
+        python manage.py migrate
 
     - name: Run tests
       run: |
-        source venv/bin/activate
-        python manage.py test  # Run the tests defined in your Django app
-
-  # Deployment job (if needed)
-  # deploy:
-  #   runs-on: ubuntu-latest  # Use Ubuntu as the operating system
-  #   needs: test  # This job will only run if the tests pass
-
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2  # Check out the repository code
-
-  #   - name: Deploy to server (example: using SSH)
-  #     run: |
-  #       ssh -o StrictHostKeyChecking=no user@your_server_ip <<EOF
-  #       cd /path/to/your/project
-  #       git pull origin main  # Pull the latest changes
-  #       source venv/bin/activate  # Activate virtual environment
-  #       pip install -r requirements.txt  # Install dependencies
-  #       python manage.py migrate  # Run migrations
-  #       python manage.py collectstatic --noinput  # Collect static files for production
-  #       systemctl restart your-web-server  # Restart your web server (e.g., Gunicorn)
-  #       EOF
+        python manage.py test
