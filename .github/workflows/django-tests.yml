@@ -16,10 +16,10 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_ROOT_PASSWORD: Cheruku@0627
           MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: password
+          MYSQL_USER: root
+          MYSQL_PASSWORD: Cheruku@0627
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-timeout=30s --health-start-period=5s --health-retries=3
@@ -47,8 +47,8 @@ jobs:
 
     - name: Grant permissions to root user
       run: |
-        mysql -h 127.0.0.1 -u root -p Cheruku@0627 -e "CREATE DATABASE IF NOT EXISTS test_test_db;"
-        mysql -h 127.0.0.1 -u root -p Cheruku@0627 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${{ secrets.MYSQL_ROOT_PASSWORD }}';"
+        mysql -h 127.0.0.1 -u root -p Cheruku@0627 -e "CREATE DATABASE IF NOT EXISTS test_db;"
+        mysql -h 127.0.0.1 -u root -p Cheruku@0627 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${{ secrets.MYSQL_PASSWORD }}';"
         mysql -h 127.0.0.1 -u root -p Cheruku@0627 -e "FLUSH PRIVILEGES;"
 
     - name: Run Django migrations
