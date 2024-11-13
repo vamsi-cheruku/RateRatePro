@@ -1,14 +1,14 @@
 Django
-django-cors-headers==4.5.0
-django-elasticsearch-dsl==8.0
-djangorestframework==3.15.2
+django-cors-headers
+django-elasticsearch-dsl
+djangorestframework
 
-elastic-transport==8.15.0
-elasticsearch==8.15.1
-elasticsearch-dsl==8.15.3
+elastic-transport
+elasticsearch
+elasticsearch-dsl
 
-mysqlclient==2.2.4
-opensearch-py==2.7.1
+mysqlclient
+opensearch-py
 
 better_profanity
 python-dotenv
