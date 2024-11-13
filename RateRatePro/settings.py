@@ -78,11 +78,11 @@ DATABASES = {
     "default": {
         
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_db',
-        'USER': 'root',
-        'PASSWORD': 'my_password',
-        'HOST': 'mysql',  # 'mysql' matches the service name in GitHub Actions
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME', 'default_db'),
+        'USER': os.getenv('DB_USER', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
         
         # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'test_rateratepro',
