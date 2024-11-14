@@ -16,11 +16,11 @@ jobs:
       mysql:
         image: mysql:8
         ports:
-          - 3306:3306  # Use the same port (3306) for both container and host
+          - 3306:3306  # Map container's port 3306 to host's port 3306
         options: >-
-          --env MYSQL_ROOT_PASSWORD=Cheruku@0627
-          --env MYSQL_DATABASE=test_rateratepro
-          --env MYSQL_USER=root
+          --env MYSQL_ROOT_PASSWORD=Cheruku@0627  # Set the root password
+          --env MYSQL_DATABASE=test_rateratepro  # Create the database
+          # Remove MYSQL_USER as it is conflicting with root user configuration
 
     steps:
       - name: Checkout code
