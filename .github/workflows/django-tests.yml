@@ -55,6 +55,6 @@ jobs:
           DATABASE_PORT: ${{vars.MYSQL_PORT}}        # Use the correct MySQL port
           DATABASE_NAME: test_rateratepro
           DATABASE_USER: ${{vars.MYSQL_USER}}
-          DATABASE_PASSWORD: Cheruku@0627
+          DATABASE_PASSWORD: ${{secrets.MYSQL_ROOT_PASSWORD}}
         run: |
           python manage.py test  # Run Django tests
