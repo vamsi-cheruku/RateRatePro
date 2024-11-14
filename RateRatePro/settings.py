@@ -79,7 +79,7 @@ DATABASES = {
         
         #! MySQL crediantial for localhost
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_database',  # Your test database
+        'NAME': 'test_rateratepro',  # Your test database
         'USER': 'root',
         'PASSWORD': 'Cheruku@0627',
         'HOST': 'localhost',  # Correct for GitHub Actions, or use '127.0.0.1'
