@@ -43,7 +43,7 @@ jobs:
       - name: Wait for MySQL to start
         run: |
           echo "Waiting for MySQL to be ready..."
-          until mysqladmin -h 127.0.0.1 -P 3307 -u root -pCheruku@0627 ping --silent; do
+          until mysqladmin -h mysql -P 3307 -u root -pCheruku@0627 ping --silent; do  # Change to 3307 to match your docker port
               echo "Waiting for MySQL..."
               sleep 10
           done
