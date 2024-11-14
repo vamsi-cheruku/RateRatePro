@@ -82,8 +82,8 @@ DATABASES = {
         'NAME': 'test_rateratepro',  # Your test database
         'USER': 'root',
         'PASSWORD': 'Cheruku@0627',
-        'HOST': 'mysql',  # Correct for GitHub Actions, or use '127.0.0.1'
-        'PORT': '3306',  # The port mapped in the Docker container
+        'HOST': '127.0.0.1',  # Connects to MySQL service in GitHub Actions
+        'PORT': '3306',  # MySQL port mapped in Docker
         
         #! MySQL credintials for AWS
         # 'USER': 'admin',
