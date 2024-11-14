@@ -77,14 +77,13 @@ WSGI_APPLICATION = "RateRatePro.wsgi.application"
 DATABASES = {
     "default": {
         
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_rateratepro',
-        
         #! MySQL crediantial for localhost
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'test_database',  # Your test database
         'USER': 'root',
         'PASSWORD': 'Cheruku@0627',
-        'HOST': 'localhost',  # or '127.0.0.1' for development
-        'PORT': '3307',  # Updated port
+        'HOST': 'localhost',  # Correct for GitHub Actions, or use '127.0.0.1'
+        'PORT': '3307',  # The port mapped in the Docker container
         
         #! MySQL credintials for AWS
         # 'USER': 'admin',
