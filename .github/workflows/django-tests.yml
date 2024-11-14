@@ -18,9 +18,10 @@ jobs:
         ports:
           - 3306:3306  # Map container's port 3306 to host's port 3306
         options: >-
-          --env MYSQL_ROOT_PASSWORD=Cheruku@0627  # Set the root password
-          --env MYSQL_DATABASE=test_rateratepro  # Create the database
-          # Remove MYSQL_USER as it is conflicting with root user configuration
+          --env MYSQL_ROOT_PASSWORD=Cheruku@0627
+          --env MYSQL_DATABASE=test_rateratepro
+          -e GITHUB_ACTIONS=true
+          -e CI=true
 
     steps:
       - name: Checkout code
