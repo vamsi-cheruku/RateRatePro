@@ -86,10 +86,10 @@ DATABASES = {
         'PORT': '3306',  # MySQL port mapped in Docker
         
         #! MySQL credintials for AWS
-        # 'USER': 'admin',
-        # 'PASSWORD': 'rootadmin',
-        # 'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
-        # 'PORT': '3306',  # default MySQL port
+        'USER': 'admin',
+        'PASSWORD': 'rootadmin',
+        'HOST': 'rateratepro.cr6qy22gqg7f.us-east-1.rds.amazonaws.com',  # e.g., the hostname provided by the MySQL service
+        'PORT': '3306',  # default MySQL port
         
         
     }

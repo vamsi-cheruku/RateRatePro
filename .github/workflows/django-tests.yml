@@ -18,7 +18,7 @@ jobs:
         ports:
           - 3306:3306  # MySQL container uses port 3306 inside the container
         options: >-
-          --env MYSQL_ROOT_PASSWORD=Cheruku@0627
+          --env MYSQL_ROOT_PASSWORD=${{secrets,MYSQL_ROOT_PASSWORD}}
           --env MYSQL_DATABASE=test_rateratepro
           -e GITHUB_ACTIONS=true
           -e CI=true
@@ -43,7 +43,7 @@ jobs:
       - name: Wait for MySQL to start
         run: |
           echo "Waiting for MySQL to be ready..."
-          until mysqladmin -h 127.0.0.1 -P 3306 -u root -pCheruku@0627 ping --silent; do
+          until mysqladmin -h ${{vars.MYSQL_HOST}} -P ${{vars.MYSQL_PORT}} -u root -p${{secrets.MYSQL_ROOT_PASSWORD}} ping --silent; do
               echo "Waiting for MySQL..."
               sleep 10
           done
@@ -51,10 +51,10 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_HOST: 127.0.0.1  # Point to the MySQL service
-          DATABASE_PORT: 3306        # Use the correct MySQL port
+          DATABASE_HOST: ${{vars.MYSQL_HOST}} # Point to the MySQL service
+          DATABASE_PORT: ${{vars.MYSQL_PORT}}        # Use the correct MySQL port
           DATABASE_NAME: test_rateratepro
-          DATABASE_USER: root
-          DATABASE_PASSWORD: Cheruku@0627
+          DATABASE_USER: ${{vars.MYSQL_USER}}
+          DATABASE_PASSWORD: ${{secrets.MYSQL_ROOT_PASSWORD}}
         run: |
           python manage.py test  # Run Django tests
