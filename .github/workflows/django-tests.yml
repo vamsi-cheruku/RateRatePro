@@ -17,12 +17,6 @@ jobs:
         image: mysql:8
         ports:
           - 3306:3306  # MySQL container uses port 3306 inside the container
-        options: >-
-          --env MYSQL_ROOT_PASSWORD=${{secrets.MYSQL_ROOT_PASSWORD}}
-          --env MYSQL_DATABASE=test_rateratepro
-          -e GITHUB_ACTIONS=true
-          -e CI=true
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
