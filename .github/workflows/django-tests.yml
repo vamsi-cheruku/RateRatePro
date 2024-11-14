@@ -1,3 +1,44 @@
-- name: Test MySQL connection
-  run: |
-    mysql -h mysql -P 3306 -u root -pCheruku@0627 -e "SHOW DATABASES;"
+name: Test MySQL Connection
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  mysql-connection:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        ports:
+          - 3306:3306  # Expose MySQL port 3306
+        options: >-
+          --env MYSQL_ROOT_PASSWORD=Cheruku@0627
+          --env MYSQL_DATABASE=test_rateratepro
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up MySQL client
+        run: sudo apt-get install mysql-client
+
+      - name: Wait for MySQL to start
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          until mysqladmin -h mysql -P 3306 -u root -pCheruku@0627 ping --silent; do
+              echo "Waiting for MySQL..."
+              sleep 5
+          done
+          echo "MySQL is ready!"
+
+      - name: Test MySQL connection
+        run: |
+          echo "Testing MySQL connection..."
+          mysql -h mysql -P 3306 -u root -pCheruku@0627 -e "SHOW DATABASES;"
+          echo "MySQL connection test passed."
