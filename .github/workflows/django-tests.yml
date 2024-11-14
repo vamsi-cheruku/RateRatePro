@@ -16,7 +16,7 @@ jobs:
       mysql:
         image: mysql:8
         ports:
-          - 3307:3306  # Map container's port 3306 to host's port 3307
+          - 3306:3306  # Use the same port (3306) for both container and host
         options: >-
           --env MYSQL_ROOT_PASSWORD=Cheruku@0627
           --env MYSQL_DATABASE=test_rateratepro
@@ -32,7 +32,7 @@ jobs:
       - name: Wait for MySQL to start
         run: |
           echo "Waiting for MySQL to be ready..."
-          until mysql -h 127.0.0.1 -P 3307 -u root -pCheruku@0627 -e "SHOW DATABASES;"; do
+          until mysql -h 127.0.0.1 -P 3306 -u root -pCheruku@0627 -e "SHOW DATABASES;"; do
             echo "Waiting for MySQL..."
             sleep 5
           done
