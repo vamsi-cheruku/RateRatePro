@@ -1,31 +1,51 @@
-name: Django CI/CD Pipeline
+name: Django Tests with Dockerized MySQL
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  test-cases:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest  # The OS to run the tests on
+    
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.0  # Docker image for MySQL
         env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: your_db_name
+          MYSQL_ROOT_PASSWORD: Cheruku@0627  # Password for root user
+          MYSQL_DATABASE: test_db  # Database name for testing
         ports:
-          - 3306:3306
+          - 3307:3306  # Map the host port (3307) to the container port (3306)
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: 3.x  # Version of Python to use
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Install required dependencies
+
       - name: Run migrations
         run: |
-          python manage.py migrate
+          python manage.py migrate  # Run migrations to set up the database
+
+      - name: Run tests
+        env:
+          DATABASE_URL: mysql://root:Cheruku@0627@localhost:3307/test_db  # Database connection URL
+        run: |
+          python manage.py test  # Run your Django test cases

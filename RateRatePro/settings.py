@@ -78,19 +78,13 @@ DATABASES = {
     "default": {
         
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'your_db_name',
-        'USER': 'root',
-        'PASSWORD': 'rootpassword',
-        'HOST': 'localhost',  # The default host when using services
-        'PORT': '3306',
-        
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'test_rateratepro',
+        'NAME': 'test_rateratepro',
         
         #! MySQL crediantial for localhost
-        # 'USER': 'root',
-        # 'PASSWORD': 'Cheruku@0627',
-        # 'HOST': 'localhost',  # or '127.0.0.1' for development
+        'USER': 'root',
+        'PASSWORD': 'Cheruku@0627',
+        'HOST': 'localhost',  # or '127.0.0.1' for development
+        'PORT': '3307',  # Updated port
         
         #! MySQL credintials for AWS
         # 'USER': 'admin',
