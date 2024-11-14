@@ -43,11 +43,12 @@ jobs:
       - name: Wait for MySQL to start
         run: |
           echo "Waiting for MySQL to be ready..."
-          until mysqladmin -h mysql -P 3306 -u root -pCheruku@0627 ping --silent; do
-            echo "Waiting for MySQL..."
-            sleep 5
+          until mysqladmin -h mysql-container -P 3306 -u root -pCheruku@0627 ping --silent; do
+              echo "Waiting for MySQL..."
+              sleep 5
           done
           echo "MySQL is ready!"
+
 
 
       - name: Run tests
