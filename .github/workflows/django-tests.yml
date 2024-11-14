@@ -43,7 +43,7 @@ jobs:
       - name: Wait for MySQL to start
         run: |
           echo "Waiting for MySQL to be ready..."
-          until mysql -h 127.0.0.1 -P 3307 -u root -pCheruku@0627 -e "SHOW DATABASES;"; do  # Change port to 3307
+          until mysql -h mysql -P 3306 -u root -pCheruku@0627 -e "SHOW DATABASES;"; do
             echo "Waiting for MySQL..."
             sleep 5
           done
