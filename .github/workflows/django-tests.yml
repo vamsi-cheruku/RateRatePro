@@ -63,7 +63,7 @@ jobs:
         if: success()  # This step will run only if the workflow is successful
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
+          server_address: smtp.office365.com
           server_port: 465
           username: ${{vars.SMTP_USERNAME}}  
           password: ${{secrets.SMTP_PASSWORD}}
