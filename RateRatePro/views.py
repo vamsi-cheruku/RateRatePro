@@ -18,6 +18,7 @@ from .constants import esconsts
 from .models import *
 from .opensearch.opensearch import *
 from .serializers import *
+from .ai_util import summarize_texts
 
 
 @api_view(['POST'])
@@ -284,7 +285,7 @@ def fetch_overall_rating(request):
                     hardness_avg=Avg('hardness')
                 )
 
-                feedback_list = list(ratings.values_list('feedback', flat=True)[:3])
+                feedback_list = list(ratings.values_list('feedback', flat=True))
                 would_take_again_counts = {
                     '1': aggregated_data['would_take_again_count_1'],
                     '0': aggregated_data['would_take_again_count_0']
@@ -294,7 +295,13 @@ def fetch_overall_rating(request):
                 courses = list(Courses.objects.filter(
                     id__in=ProfessorCourses.objects.filter(professor_id=professor_id).values('course_id')
                 ).values('id', 'name', 'status'))
-
+                
+                # Summarize comments using OpenAI
+                if not feedback_list or not isinstance(feedback_list, list):
+                    return Response({"error": "Invalid input. Provide a list of text strings."}, status=400)
+                # Summarize the input texts using the AI utility
+                feedback_summary = summarize_texts(feedback_list)
+                
                 # Combine aggregated data and additional info
                 response_data = {
                     'overall_rating': round(aggregated_data['overall_rating_avg'], 2),
@@ -303,7 +310,8 @@ def fetch_overall_rating(request):
                     'teaching_ability': round(aggregated_data['teaching_ability_avg'], 2),
                     'interactions_with_students': round(aggregated_data['interactions_with_students_avg'], 2),
                     'hardness': round(aggregated_data['hardness_avg'], 2),
-                    'feedback': feedback_list,
+                    'feedback': feedback_list[:3],
+                    'feedback_summary' : feedback_summary,
                     'courses': courses  # Pass list of dictionaries directly
                 }
 

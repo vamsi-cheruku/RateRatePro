@@ -15,3 +15,5 @@ python-dotenv
 django-environ
 
 pytest-django>=4.4  # For running tests with Django
+
+transformers
