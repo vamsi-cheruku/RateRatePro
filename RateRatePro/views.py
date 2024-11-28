@@ -435,12 +435,13 @@ def student_rating_history(request):
             professor_user = professor.id  # `professor.id` is a reference to the related Users model
             professor_name = professor_user.username  # Assuming username is stored in Users model
             professor_email = professor_user.email  # Assuming email is stored in Users model
-
+            professor_id = professor_user.id
             # Construct the rating data with professor details
             rating_data = RatingsSerializer(rating).data
-            rating_data['professor'] = {
-                "professor_name": professor_name,
-                "professor_email": professor_email
+            rating_data['professor_info'] = {
+                "id": professor_id,
+                "name": professor_name,
+                "email": professor_email,
             }
             ratings_with_professor_details.append(rating_data)
 
