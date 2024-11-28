@@ -415,7 +415,7 @@ def assign_course_to_professor(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_ratings_by_student(request):
+def student_rating_history(request):
     student_id = request.query_params.get('student_id')  # Extract student_id from query parameters
     if not student_id:
         return Response({"error": "student_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -423,12 +423,33 @@ def get_ratings_by_student(request):
     try:
         # Fetch ratings for the given student_id
         ratings = Ratings.objects.filter(student_id=student_id)
-        # Serialize the ratings data
-        serializer = RatingsSerializer(ratings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # Prepare a list to store the ratings with professor details
+        ratings_with_professor_details = []
+
+        for rating in ratings:
+            # Fetch the professor related to the rating
+            professor = rating.professor_id  # This is the Professors object
+
+            # Fetch the professor's user details (name, email)
+            professor_user = professor.id  # `professor.id` is a reference to the related Users model
+            professor_name = professor_user.username  # Assuming username is stored in Users model
+            professor_email = professor_user.email  # Assuming email is stored in Users model
+
+            # Construct the rating data with professor details
+            rating_data = RatingsSerializer(rating).data
+            rating_data['professor'] = {
+                "professor_name": professor_name,
+                "professor_email": professor_email
+            }
+            ratings_with_professor_details.append(rating_data)
+
+        # Return the response with the serialized data
+        return Response(ratings_with_professor_details, status=status.HTTP_200_OK)
+
     except Ratings.DoesNotExist:
         return Response({"message": "No ratings found for the student."}, status=status.HTTP_404_NOT_FOUND)
-
+    
 # @api_view(['POST'])
 # def password_reset(self, request):
 #     serializer = PasswordResetSerializer(data=request.data)

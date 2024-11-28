@@ -100,7 +100,7 @@ class Professors(models.Model):
     overall_rating = models.FloatField(null=True, db_column='OverallRating')  # OverallRating can be null if not set
 
     def __str__(self):
-        return self.name
+        return self.id.username
     
     class Meta:
         db_table = 'Professors'
