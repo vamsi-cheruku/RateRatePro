@@ -59,18 +59,3 @@ jobs:
         run: |
           python manage.py test  # Run Django tests
       
-      # - name: Send success email
-      #   if: success()  # This step will run only if the workflow is successful
-      #   uses: dawidd6/action-send-mail@v3
-      #   with:
-      #     server_address: smtp.office365.com
-      #     server_port: 465
-      #     username: ${{vars.SMTP_USERNAME}}  
-      #     password: ${{secrets.SMTP_PASSWORD}}
-      #     subject: "GitHub Actions Workflow Succeeded"
-      #     body: |
-      #       The API test cases have been successfully executed.
-      #       All tests passed. You can review the details in the GitHub Actions logs.
-      #     to: |
-      #       munazzahrizwan.rakhangi@slu.edu
-      #     from: Vamsi Cheruku vamsi.cheruku@slu.edu

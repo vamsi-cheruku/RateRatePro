@@ -3,10 +3,6 @@ django-cors-headers
 django-elasticsearch-dsl
 djangorestframework>=3.12
 
-elastic-transport
-elasticsearch
-elasticsearch-dsl
-
 mysqlclient
 opensearch-py
 
@@ -17,3 +13,5 @@ django-environ
 pytest-django>=4.4  # For running tests with Django
 
 transformers
+torch
+tensorflow

@@ -17,7 +17,7 @@ SECRET_KEY = "django-insecure-j7-x)@b=5yrbz(+c&*+&f(2d1k$)=*a530uhh#!@%4m)w-5jfe
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.88.219.13','34.205.32.248', 'localhost', '127.0.0.1', '54.211.21.255']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '54.145.162.200']
 
 # To neglect the slash at the end of endpoint
 # APPEND_SLASH = False

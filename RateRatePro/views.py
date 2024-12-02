@@ -14,11 +14,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .ai_util import summarize_texts
 from .constants import esconsts
 from .models import *
 from .opensearch.opensearch import *
 from .serializers import *
-from .ai_util import summarize_texts
 
 
 @api_view(['POST'])
